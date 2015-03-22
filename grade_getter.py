@@ -49,22 +49,27 @@ from selenium.common.exceptions import NoSuchElementException
 
 def downloadGradesToTestFile():
 	print "Getting grades from myucla"
+	#Loading up the links to the grades
 	classID_list = []
 	for i in range(5):
 		classID_list.append( "ctl00_MainContent_studyListDataList_ctl0" + `(2 * i + 1)` + "_gradesButton")
 
+
+	#Firing up driver and navigating to signin page
 	driver = webdriver.PhantomJS('C:\Users\Guava\Desktop\TestDir\phantomjs-1.9.8-windows\phantomjs-1.9.8-windows\phantomjs.exe')
+	#driver = webdriver.Firefox()
 	driver.get("https://my.ucla.edu/")	
 	signin = driver.find_element_by_xpath("//*[@id='ctl00_signInLink']")
 	signin.click()
 	try:
-		element = WebDriverWait(driver, 10).until(
-			EC.title_is("UCLA Logon")
-			)
+		element = WebDriverWait(driver, 10).until(EC.title_is("UCLA Logon"))
 	except TimeoutException:
 		print "Timeout error"
 		driver.quit()
 		exit()
+
+
+	#Logging in
 	username = driver.find_element_by_xpath("(//input)[1]")
 	password = driver.find_element_by_xpath("(//input)[2]")	
 	loginInfo = extractPasswords()
@@ -72,26 +77,20 @@ def downloadGradesToTestFile():
 	password.send_keys(loginInfo[1])
 	password.send_keys(Keys.RETURN)
 	try:
-		element = WebDriverWait(driver, 10).until(
-			EC.title_contains("Study List")
-			)
+		element = WebDriverWait(driver, 10).until(EC.title_contains("Study List"))
 	except TimeoutException:
 		print "Timeout error"
 		driver.quit()
 		exit()
+
 	fp_curgrades = open('grades.txt', 'w')
+
+	#Going to each classes grades and downloading them to the text file
 	try:
 		for gradelink in classID_list:
 			grades = driver.find_element_by_id(gradelink)
 			grades.click()
-			try:
-				element = WebDriverWait(driver, 20).until(
-					EC.title_contains("Exam and Homework Grades")
-					)
-			except TimeoutException:
-				print "Timeout error"
-				driver.quit()
-				exit()
+			element = WebDriverWait(driver, 20).until(EC.title_contains("Exam and Homework Grades"))
 
 			lectureName = driver.find_element_by_class_name("term_display")
 			class_title = "------------------------------------------\n%s\n------------------------------------------\n" % (lectureName.text,)
@@ -104,17 +103,16 @@ def downloadGradesToTestFile():
 			fp_curgrades.write("\n\n\n")
 			driver.get("https://be.my.ucla.edu/studylist.aspx")
 
-			try:
-				element = WebDriverWait(driver, 20).until(
-					EC.title_contains("Study List")
-					)
-			except TimeoutException:
-				print "Timeout error"
-				driver.quit()
-				fp_curgrades.close()
-				exit()
+		
+			element = WebDriverWait(driver, 20).until(EC.title_contains("Study List"))
+
 	except NoSuchElementException:
 		print "Finished!"
+		driver.quit()
+		fp_curgrades.close()
+		exit()
+	except TimeoutException:
+		print "Timeout error"
 		driver.quit()
 		fp_curgrades.close()
 		exit()

@@ -1,0 +1,4 @@
+<h1>MyUCLA Grade Getter</h1>
+I got tired of going through all the layers of interface to read my grades (ugh large institutions and their multiple websites requiring multiple login info, why don't you fix up your beaucratic game!!)
+<br>
+If you want to download and use this script, you need two things: phantomJS, and Selenium. You're going to need to go into my program and change a few filepaths as well, but besides that, you'll be good to go. Also, there's an option for you to use the firefox driver instead of the phantomJS driver, but it opens up the firefox gui which is annoying and also makes the program take longer
